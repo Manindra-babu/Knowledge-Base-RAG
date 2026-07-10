@@ -1,12 +1,13 @@
 const fs = require('fs');
-const pdfParse = require('pdf-parse');
+const { PDFParse } = require('pdf-parse');
 const mammoth = require('mammoth');
 
 async function parseDocument(filePath, mimeType) {
   try {
     if (mimeType === 'application/pdf') {
       const dataBuffer = fs.readFileSync(filePath);
-      const data = await pdfParse(dataBuffer);
+      const parser = new PDFParse({ data: dataBuffer });
+      const data = await parser.getText();
       return data.text;
     } else if (
       mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
