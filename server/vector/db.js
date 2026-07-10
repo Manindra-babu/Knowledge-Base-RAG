@@ -23,8 +23,12 @@ async function getExtractor() {
 
 async function embedTexts(texts) {
   const extractor = await getExtractor();
-  const output = await extractor(texts, { pooling: 'mean', normalize: true });
-  return output.tolist();
+  const embeddings = [];
+  for (const text of texts) {
+    const output = await extractor(text, { pooling: 'mean', normalize: true });
+    embeddings.push(output.tolist()[0]);
+  }
+  return embeddings;
 }
 
 let memoryVectors = [];
