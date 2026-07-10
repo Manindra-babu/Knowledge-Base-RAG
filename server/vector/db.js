@@ -9,7 +9,14 @@ let extractorPipeline = null;
 
 async function getExtractor() {
   if (!extractorPipeline) {
-    extractorPipeline = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2');
+    extractorPipeline = await pipeline('feature-extraction', 'Xenova/all-MiniLM-L6-v2', {
+      session_options: {
+        intraOpNumThreads: 1,
+        interOpNumThreads: 1,
+        enableCpuMemArena: false,
+        enableMemPattern: false
+      }
+    });
   }
   return extractorPipeline;
 }
