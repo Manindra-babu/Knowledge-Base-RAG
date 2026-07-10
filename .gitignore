@@ -8,4 +8,4 @@ build/
 # Backend specific
 server/uploads/
 server/vector/store.json
-server/data/documents.json
+server/documents.json
