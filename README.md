@@ -352,7 +352,7 @@ MIT License — feel free to use, modify, and distribute.
 
 ## 💬 Support
 
-If you run into issues, open a GitHub Issue or reach out at your@email.com.
+If you run into issues, open a GitHub Issue or reach out at manindrachowdhary1715@email.com.
 
 ---
 
