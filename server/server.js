@@ -71,7 +71,7 @@ app.post('/api/documents/upload', upload.single('file'), async (req, res) => {
     const text = await parseDocument(filePath, mimeType);
     
     // Chunk and Store in Vector DB
-    await addDocumentToStore(
+    const chunkCount = await addDocumentToStore(
       fileId, 
       fileName, 
       text, 
@@ -83,6 +83,7 @@ app.post('/api/documents/upload', upload.single('file'), async (req, res) => {
       id: fileId,
       name: fileName,
       size: req.file.size,
+      chunks: chunkCount,
       uploadDate: new Date().toISOString(),
       status: 'Ready'
     };
@@ -98,7 +99,12 @@ app.post('/api/documents/upload', upload.single('file'), async (req, res) => {
 });
 
 app.get('/api/documents', (req, res) => {
-  res.json(documents);
+  const { getDocumentChunkCount } = require('./vector/db');
+  const augmentedDocs = documents.map(doc => ({
+    ...doc,
+    chunks: doc.chunks || getDocumentChunkCount(doc.id)
+  }));
+  res.json(augmentedDocs);
 });
 
 app.delete('/api/documents/:id', async (req, res) => {

@@ -101,6 +101,11 @@ async function addDocumentToStore(fileId, fileName, text, chunkSize = 1000, chun
   
   await saveStore();
   console.log(`Added ${docs.length} chunks to vector store for file ${fileName}`);
+  return docs.length;
+}
+
+function getDocumentChunkCount(fileId) {
+  return memoryVectors.filter(vec => vec.metadata && vec.metadata.fileId === fileId).length;
 }
 
 async function deleteDocumentFromStore(fileId) {
@@ -129,5 +134,6 @@ module.exports = {
   initVectorStore,
   addDocumentToStore,
   deleteDocumentFromStore,
-  searchSimilarChunks
+  searchSimilarChunks,
+  getDocumentChunkCount
 };

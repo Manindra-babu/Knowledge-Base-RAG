@@ -103,13 +103,37 @@ export default function Sidebar({ documents, refreshDocs, selectedDocIds, toggle
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
-              <div className="flex justify-between items-center text-xs text-gray-500 pl-6">
-                <span>{(doc.size / 1024).toFixed(1)} KB</span>
-                {doc.status === 'Ready' ? (
-                  <span className="flex items-center text-green-500"><CheckCircle2 className="w-3 h-3 mr-1"/> Ready</span>
-                ) : (
-                  <span className="flex items-center text-yellow-500"><AlertCircle className="w-3 h-3 mr-1"/> Error</span>
+              <div className="pl-6 space-y-1 text-xs text-muted-foreground">
+                <div className="flex justify-between">
+                  <span>Size:</span>
+                  <span className="font-medium text-foreground">{(doc.size / 1024).toFixed(1)} KB</span>
+                </div>
+                {doc.chunks !== undefined && (
+                  <div className="flex justify-between">
+                    <span>Chunks:</span>
+                    <span className="font-medium text-foreground">{doc.chunks}</span>
+                  </div>
                 )}
+                {doc.uploadDate && (
+                  <div className="flex justify-between">
+                    <span>Uploaded:</span>
+                    <span className="font-medium text-foreground">
+                      {new Date(doc.uploadDate).toLocaleDateString(undefined, { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                      })}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between items-center pt-1 border-t border-border/50">
+                  <span>Status:</span>
+                  {doc.status === 'Ready' ? (
+                    <span className="flex items-center text-green-600 dark:text-green-500 font-medium"><CheckCircle2 className="w-3 h-3 mr-1"/> Ready</span>
+                  ) : (
+                    <span className="flex items-center text-yellow-600 dark:text-yellow-500 font-medium"><AlertCircle className="w-3 h-3 mr-1"/> Error</span>
+                  )}
+                </div>
               </div>
             </div>
           ))
