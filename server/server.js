@@ -128,6 +128,31 @@ app.post('/api/chat', async (req, res) => {
       return res.status(400).json({ error: 'Message is required' });
     }
 
+    const isGreeting = (msg) => {
+      const normalized = msg.toLowerCase().trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"");
+      const greetingWords = [
+        'hi', 'hello', 'hey', 'greetings', 'hola', 'yo',
+        'good morning', 'good afternoon', 'good evening',
+        'how are you', 'how is it going', 'how do you do', 'how u dng', 'how are u',
+        'whats up', 'whatsup'
+      ];
+      return greetingWords.some(word => 
+        normalized === word || 
+        normalized.startsWith(word + ' ') || 
+        normalized.endsWith(' ' + word)
+      );
+    };
+
+    if (isGreeting(message)) {
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache');
+      res.setHeader('Connection', 'keep-alive');
+      res.write(`data: ${JSON.stringify({ type: 'meta', sources: [], confidence: 'High' })}\n\n`);
+      res.write(`data: ${JSON.stringify({ type: 'text', content: 'Hello! How are you doing? Is there anything you would like to ask or clarify regarding the uploaded documents?' })}\n\n`);
+      res.write(`data: [DONE]\n\n`);
+      return res.end();
+    }
+
     // 1. Retrieve similar chunks
     const topK = parseInt(process.env.TOP_K_RESULTS || '15');
     let chunks = await searchSimilarChunks(message, topK);
@@ -161,28 +186,9 @@ app.post('/api/chat', async (req, res) => {
     // Send metadata immediately
     res.write(`data: ${JSON.stringify({ type: 'meta', sources, confidence })}\n\n`);
 
-    const isGreeting = (msg) => {
-      const normalized = msg.toLowerCase().trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"");
-      const greetingWords = [
-        'hi', 'hello', 'hey', 'greetings', 'hola', 'yo',
-        'good morning', 'good afternoon', 'good evening',
-        'how are you', 'how is it going', 'how do you do', 'how u dng', 'how are u',
-        'whats up', 'whatsup'
-      ];
-      return greetingWords.some(word => 
-        normalized === word || 
-        normalized.startsWith(word + ' ') || 
-        normalized.endsWith(' ' + word)
-      );
-    };
-
     if (chunks.length === 0 || maxScore < 0.05) {
-       // Return early with not found or greeting message
-       if (isGreeting(message)) {
-         res.write(`data: ${JSON.stringify({ type: 'text', content: 'Hello! How are you doing? Is there anything you would like to ask or clarify regarding the uploaded documents?' })}\n\n`);
-       } else {
-         res.write(`data: ${JSON.stringify({ type: 'text', content: 'I could not find any relevant information in the uploaded documents for your query.' })}\n\n`);
-       }
+       // Return early with not found message
+       res.write(`data: ${JSON.stringify({ type: 'text', content: 'I could not find any relevant information in the uploaded documents for your query.' })}\n\n`);
        res.write(`data: [DONE]\n\n`);
        return res.end();
     }
