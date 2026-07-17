@@ -136,17 +136,17 @@ app.post('/api/chat', async (req, res) => {
 
     const isGreeting = (msg) => {
       const normalized = msg.toLowerCase().trim().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?]/g,"");
-      const greetingWords = [
-        'hi', 'hello', 'hey', 'greetings', 'hola', 'yo',
-        'good morning', 'good afternoon', 'good evening',
-        'how are you', 'how is it going', 'how do you do', 'how u dng', 'how are u',
-        'whats up', 'whatsup'
-      ];
-      return greetingWords.some(word => 
-        normalized === word || 
-        normalized.startsWith(word + ' ') || 
-        normalized.endsWith(' ' + word)
-      );
+      const greetingRegex = /^(hi+|hey+|hello+|hola+|yo+|greetings?|good\s+(morning|afternoon|evening)|how\s+(are\s+u|are\s+you|u\s+dng|is\s+it\s+going)|whats?\s+up|whatsup)$/i;
+      
+      const words = normalized.split(/\s+/);
+      if (words.length > 0) {
+        const firstWord = words[0];
+        if (/^(hi+|hey+|hello+|hola+|yo+)$/i.test(firstWord)) {
+          return true;
+        }
+      }
+      
+      return greetingRegex.test(normalized);
     };
 
     if (isGreeting(message)) {
