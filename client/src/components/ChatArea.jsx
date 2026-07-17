@@ -23,6 +23,56 @@ const BotAvatar = () => (
   </div>
 );
 
+const renderFormattedContent = (content, isUser = false) => {
+  if (!content) return null;
+
+  const lines = content.split('\n');
+
+  return lines.map((line, index) => {
+    // Matches bullet points starting with *, -, or +
+    const listMatch = line.match(/^(\s*)([*+-])\s+(.*)$/);
+    
+    // Helper to format bold text: **text**
+    const formatBold = (text) => {
+      const parts = text.split(/(\*\*.*?\*\*)/g);
+      return parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return <strong key={i} className="font-bold">{part.slice(2, -2)}</strong>;
+        }
+        return part;
+      });
+    };
+
+    if (listMatch) {
+      const indent = listMatch[1].length;
+      const text = listMatch[3];
+      return (
+        <div key={index} className="flex items-start gap-2 py-0.5" style={{ paddingLeft: `${indent * 8 + 12}px` }}>
+          <span className={`${isUser ? 'text-white' : 'text-blue-600 dark:text-blue-500'} font-bold select-none`}>•</span>
+          <span className="flex-1">{formatBold(text)}</span>
+        </div>
+      );
+    }
+
+    const headerMatch = line.match(/^(#{1,6})\s+(.*)$/);
+    if (headerMatch) {
+      const level = headerMatch[1].length;
+      const text = headerMatch[2];
+      const headerClasses = 
+        level === 1 ? "text-2xl font-bold mt-4 mb-2" :
+        level === 2 ? "text-xl font-bold mt-3 mb-2" :
+        "text-lg font-bold mt-2 mb-1";
+      return <div key={index} className={headerClasses}>{formatBold(text)}</div>;
+    }
+
+    return (
+      <div key={index} className={line.trim() === '' ? 'h-3' : 'min-h-[1.25rem]'}>
+        {formatBold(line)}
+      </div>
+    );
+  });
+};
+
 export default function ChatArea({ selectedDocIds }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -169,7 +219,7 @@ export default function ChatArea({ selectedDocIds }) {
                       ? 'bg-red-500/10 border border-red-500/50 text-red-500 rounded-tl-none'
                       : 'bg-card border border-border text-foreground rounded-tl-none'
                 }`}>
-                  <div className="whitespace-pre-wrap">{msg.content}</div>
+                  <div className="whitespace-pre-wrap">{renderFormattedContent(msg.content, msg.role === 'user')}</div>
                   
                   {msg.confidence && (
                     <div className="mt-3">
