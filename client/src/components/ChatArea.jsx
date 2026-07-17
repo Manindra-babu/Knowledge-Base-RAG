@@ -2,6 +2,27 @@ import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Send, Loader2, Bot, User } from 'lucide-react';
 
+const UserAvatar = () => (
+  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 text-white">
+      <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  </div>
+);
+
+const BotAvatar = () => (
+  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-600 flex items-center justify-center flex-shrink-0 shadow-md">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-4.5 h-4.5 text-white">
+      <path d="M12 2a10 10 0 0 1 10 10v1a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-1A10 10 0 0 1 12 2z" />
+      <path d="M12 2v4" />
+      <path d="M8 10h.01" />
+      <path d="M16 10h.01" />
+      <path d="M9 14h6" />
+    </svg>
+  </div>
+);
+
 export default function ChatArea({ selectedDocIds }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -122,16 +143,25 @@ export default function ChatArea({ selectedDocIds }) {
       <div className="flex-1 overflow-y-auto p-6 space-y-6">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-500">
-            <Bot className="w-16 h-16 mb-4 opacity-20" />
-            <p className="text-lg">Ask me anything about your documents!</p>
+            <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-600 flex items-center justify-center shadow-lg mb-6 animate-pulse">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="w-11 h-11 text-white">
+                <path d="M12 2a10 10 0 0 1 10 10v1a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3v-1A10 10 0 0 1 12 2z" />
+                <path d="M12 2v4" />
+                <path d="M8 10h.01" />
+                <path d="M16 10h.01" />
+                <path d="M9 14h6" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-foreground mb-2">DocuMind AI Assistant</h2>
+            <p className="text-sm text-muted-foreground text-center max-w-sm">
+              Upload and select your documents in the sidebar, then ask questions to retrieve information instantly.
+            </p>
           </div>
         ) : (
           messages.map((msg, idx) => (
             <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`flex max-w-[80%] gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role === 'user' ? 'bg-blue-600' : 'bg-purple-600'}`}>
-                  {msg.role === 'user' ? <User className="w-5 h-5 text-white" /> : <Bot className="w-5 h-5 text-white" />}
-                </div>
+                {msg.role === 'user' ? <UserAvatar /> : <BotAvatar />}
                 <div className={`p-4 rounded-2xl ${
                   msg.role === 'user' 
                     ? 'bg-blue-600 text-white rounded-tr-none' 
@@ -160,7 +190,7 @@ export default function ChatArea({ selectedDocIds }) {
                         {msg.sources.map((source, i) => (
                           <li key={i} className="text-xs bg-muted/50 p-2 rounded border border-border/50">
                             <div className="flex justify-between items-start mb-1">
-                              <span className="font-medium text-blue-400">{source.fileName}</span>
+                              <span className="font-medium text-blue-500 dark:text-blue-400">{source.fileName}</span>
                               {source.score !== undefined && (
                                 <span className="opacity-60">Score: {(source.score * 100).toFixed(1)}%</span>
                               )}
@@ -179,9 +209,7 @@ export default function ChatArea({ selectedDocIds }) {
         {loading && (
           <div className="flex justify-start">
             <div className="flex gap-3">
-              <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center flex-shrink-0">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
+              <BotAvatar />
               <div className="p-4 rounded-2xl bg-card border border-border text-foreground rounded-tl-none flex items-center gap-2">
                 <Loader2 className="w-4 h-4 animate-spin text-purple-500" />
                 <span className="text-sm text-gray-500">Thinking...</span>
